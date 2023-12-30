@@ -1,0 +1,4 @@
+AA AA:aaa:4
+BB BB:bbb:3
+CC CCC CC:ccccc:2
+D D:dddd:1

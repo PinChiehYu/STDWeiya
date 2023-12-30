@@ -1,110 +1,54 @@
+using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
+using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Manager : MonoBehaviour
 {
-    public class Member
+    public GameObject startingObj;
+    public GameObject raffleObj;
+    public Image blackout;
+
+    private Starting starting;
+    private Raffle raffle;
+
+    [HideInInspector]
+    public DataRecord dataRecord;
+
+    void Awake()
     {
-        public string name;
-        public int teamID;
-        public int tableID;
-        public int point;
+        dataRecord = new DataRecord();
     }
-
-    private List<string> teamNames = new List<string> { "FST", "PTT", "S3T", "SET", "STT" };
-    private Dictionary<string, Member> nameToMember = new Dictionary<string, Member>();
-    private List<int> teamPoint;
-    private int totalPoint = 0;
-
-    [HeaderAttribute("Stage 1")]
-    [HeaderAttribute("Main Obj")]
-    public GameObject stageAUI;
-
-    [HeaderAttribute("Teams")]
-    public List<Button> teamBtns;
-    public List<Image> teamPieCharts;
-
-    [HeaderAttribute("Input Field")]
-    public TMP_InputField nameInputField;
-    public TMP_Text nameInputFieldPlaceholder;
-    public Button addSingleBtn;
-
-    [HeaderAttribute("Misc")]
-    public TMP_Text totalText;
-    public Button raffleBtn;
-
-    [HeaderAttribute("Stage 2")]
-    [HeaderAttribute("UI Element")]
-    public GameObject stageBUI;
 
     void Start()
     {
-        teamPoint = new List<int>{ 10, 10, 9, 9, 9 };
-        for (int i = 0; i < 5; i++)
+        starting = startingObj.GetComponent<Starting>();
+        raffle = raffleObj.GetComponent<Raffle>();
+
+        if (starting == null || raffle == null )
         {
-            int teamID = i;
-
-            totalPoint += teamPoint[i];
-            teamBtns[i].onClick.AddListener(() => AddPointToTeam(teamID));
+            Debug.LogError("Fail to find components");
         }
-
-        addSingleBtn.onClick.AddListener(AddPointToUser);
-        raffleBtn.onClick.AddListener(startRaffle);
-
-        UpdateUI();
     }
 
-    void Update()
-    {
-
-    }
-
-    public void AddPointToTeam(int team)
-    {
-        Debug.Log(team);
-
-        teamPoint[team]++;
-        totalPoint++;
-
-        UpdateUI();
-    }
-
-    public void AddPointToUser()
-    {
-        string name = nameInputField.text;
-
-        if (nameToMember.ContainsKey(name))
-        {
-            nameToMember[name].point++;
-            nameInputFieldPlaceholder.text = "<color=\"blue\">Add!</color>";
-        }
-        else
-        {
-            nameInputFieldPlaceholder.text = "<color=\"red\">WUT?</color>";
-        }
-
-        nameInputField.text = "";
-    }
-    private void UpdateUI()
-    {
-        float cumulate = 0f;
-        for (int i = 4; i >= 0; i--)
-        {
-            cumulate += (float)teamPoint[i] / totalPoint;
-            teamPieCharts[i].fillAmount = cumulate;
-        }
-
-        totalText.text = "Total : " + totalPoint.ToString();
-    }
-
-    public void startRaffle()
+    public DataRecord GetDataRecord() {  return dataRecord; }
+    public void StartRaffle()
     {
         Debug.Log("Start Raffle!");
 
-        stageAUI.SetActive(false);
-        stageBUI.SetActive(true);
+        Action ending = () =>
+        {
+            dataRecord.StartRaffleOffPrice();
+            raffleObj.SetActive(true);
+            startingObj.SetActive(false);
+        };
+
+        var seq = DOTween.Sequence();
+        seq.Append(DOTween.ToAlpha(() => blackout.color, x => blackout.color = x, 1, 0.5f).OnStepComplete(delegate { ending(); }));
+        seq.AppendInterval(0.5f);
+        seq.Append(DOTween.ToAlpha(() => blackout.color, x => blackout.color = x, 0, 0.5f).OnStepComplete(() => raffle.StartDisplay()));
     }
 }
