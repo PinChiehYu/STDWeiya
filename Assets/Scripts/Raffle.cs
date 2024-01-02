@@ -1,6 +1,5 @@
 using DG.Tweening;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -14,8 +13,15 @@ public class Raffle : MonoBehaviour
     private DataRecord record;
     private List<string> memberNames;
     private List<Member> prizeOwners;
+    private List<string> prizeNames;
 
-    private int stopSeq;
+    public GameObject detailPanel;
+    private Image detailPhoto;
+    private TMP_Text detailName;
+    private TMP_Text detailPrizeName;
+
+    private const int prizeSize = 20;
+    private int stopSeq = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +29,8 @@ public class Raffle : MonoBehaviour
         record = FindObjectOfType<Manager>().GetDataRecord();
         memberNames = record.GetAllMemberNames();
         prizeOwners = record.GetPrizeOwners();
-        stopSeq = prizeOwners.Count;
+
+        prizeNames = new() { "First Prize", "Second Prize", "Third Prize", "Forth Prize", "Fifth Prize", "Sixth Prize", "Seventh Prize", "Eighth Prize" };
 
         Transform prizeListObj = transform.Find("PrizeList");
         for (int i = 0; i < prizeOwners.Count; i++)
@@ -38,46 +45,55 @@ public class Raffle : MonoBehaviour
             prizeBtn.onClick.AddListener(() => ShowPrizeDetail(prizeID));
             prizeBtn.enabled = false;
         }
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        for (int i = 0; i < prizeTags.Count; i++) 
-        {
-            if (i < stopSeq)
-            {
-                prizeTags[i].text = memberNames[UnityEngine.Random.Range(0, memberNames.Count)];
-            }
-        }
+        detailPhoto = detailPanel.transform.Find("Photo").gameObject.GetComponent<Image>();
+        detailName = detailPanel.transform.Find("Name").gameObject.GetComponent<TMP_Text>();
+        detailPrizeName = detailPanel.transform.Find("PrizeName").gameObject.GetComponent<TMP_Text>();
+        detailPanel.SetActive(false);
     }
 
     public void StartDisplay()
     {
         Debug.Log("Yea");
-
     }
 
-    public void StopRandom()
+    public void StartRaffleProcess()
     {
-        if (stopSeq == 0) return;
+        if (stopSeq == prizeSize) return;
 
         Action<int> updateShuffle = (int prizeID) =>
         {
-            Debug.Log(prizeID);
-            stopSeq = prizeID;
-            prizeTags[prizeID].text = "Done!";
-            prizeBtnLists[prizeID].enabled = true;
+            if (stopSeq != prizeID)
+            {
+                stopSeq = prizeID;
+                prizeTags[prizeID-1].text = "Done!";
+                prizeBtnLists[prizeID-1].enabled = true;
+            }
+
+            for (int i = stopSeq; i < 20; i++)
+            {
+                prizeTags[i].text = memberNames[UnityEngine.Random.Range(0, memberNames.Count)];
+            }
         };
 
-        stopSeq -= 1;
-        DOTween.To(() => stopSeq, priceID => updateShuffle(priceID), 0, 10);
+        DOTween.To(() => stopSeq, prizeID => updateShuffle(prizeID), prizeSize, 10).SetEase(Ease.InCirc);
     }
 
     public void ShowPrizeDetail(int prizeID)
     {
-        Debug.Log(prizeID);
+        if (detailPanel.activeSelf) return;
 
         prizeTags[prizeID].text = prizeOwners[prizeID].name;
+
+        detailName.text = prizeOwners[prizeID].name;
+        detailPrizeName.text = prizeID < 5 ? prizeNames[prizeID] : prizeNames[4 + prizeID / 5];
+
+        detailPanel.SetActive(true);
+        detailPanel.transform.DOScale(1, 0.3f).SetEase(Ease.OutBack);
+    }
+
+    public void ClosePrizeDetail()
+    {
+        detailPanel.transform.DOScale(0, 0.3f).SetEase(Ease.InBack).OnComplete(() => detailPanel.SetActive(false));
     }
 }

@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.NetworkInformation;
 using UnityEngine;
 public class Member
 {
@@ -66,28 +63,42 @@ public class DataRecord
         totalPoint = 0;
     }
 
-    public bool AddPointToTeam(int teamID)
+    private int SortMember(Member a, Member b)
+    {
+        if (a.point > b.point) return 1;
+        if (a.point < b.point) return -1;
+        
+        return a.name.CompareTo(b.name);
+    }
+
+    public bool AddPointToTeam(int teamID, bool revert = false)
     {
         if (teamID < 0 || teamID > 4) return false;
 
+        int point = revert ? -1 : 1;
+
         foreach (Member member in teamToMembers[teamID])
         {
-            member.point++;
-            teamPoint[teamID]++;
-            totalPoint++;
+            member.point += point;
+            teamPoint[teamID] += point;
+            totalPoint += point;
         }
 
+        members.Sort(SortMember);
         return true;
     }
 
-    public bool AddPointToMember(string account)
+    public bool AddPointToMember(string account, bool revert = false)
     {
         if (!accountToMembers.ContainsKey(account)) return false;
 
-        accountToMembers[account].point++;
-        teamPoint[accountToMembers[account].teamID]++;
-        totalPoint++;
+        int point = revert ? -1 : 1;
 
+        accountToMembers[account].point += point;
+        teamPoint[accountToMembers[account].teamID] += point;
+        totalPoint += point;
+
+        members.Sort(SortMember);
         return true;
     }
 
@@ -107,7 +118,7 @@ public class DataRecord
 
     public List<Member> GetPrizeOwners() { return prizeOwners; }
 
-    public void StartRaffleOffPrice()
+    public void Raffle()
     {
         UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
 
@@ -124,7 +135,6 @@ public class DataRecord
                 cumulate += member.point;
                 if (cumulate > poll)
                 {
-                    Debug.Log(member.name);
                     prizeOwners.Add(member);
                     remainPoint -= member.point;
                     remainMembers.Remove(member);

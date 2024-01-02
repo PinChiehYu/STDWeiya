@@ -1,8 +1,5 @@
 using DG.Tweening;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,11 +34,9 @@ public class Manager : MonoBehaviour
     public DataRecord GetDataRecord() {  return dataRecord; }
     public void StartRaffle()
     {
-        Debug.Log("Start Raffle!");
-
         Action ending = () =>
         {
-            dataRecord.StartRaffleOffPrice();
+            dataRecord.Raffle();
             raffleObj.SetActive(true);
             startingObj.SetActive(false);
         };
@@ -50,5 +45,10 @@ public class Manager : MonoBehaviour
         seq.Append(DOTween.ToAlpha(() => blackout.color, x => blackout.color = x, 1, 0.5f).OnStepComplete(delegate { ending(); }));
         seq.AppendInterval(0.5f);
         seq.Append(DOTween.ToAlpha(() => blackout.color, x => blackout.color = x, 0, 0.5f).OnStepComplete(() => raffle.StartDisplay()));
+    }
+
+    public void CloseApp()
+    {
+        Application.Quit();
     }
 }
