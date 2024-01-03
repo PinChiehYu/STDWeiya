@@ -12,8 +12,9 @@ public class Manager : MonoBehaviour
     private Starting starting;
     private Raffle raffle;
 
-    [HideInInspector]
     public DataRecord dataRecord;
+
+    private bool firstUpdate = false;
 
     void Awake()
     {
@@ -24,14 +25,18 @@ public class Manager : MonoBehaviour
     {
         starting = startingObj.GetComponent<Starting>();
         raffle = raffleObj.GetComponent<Raffle>();
+    }
 
-        if (starting == null || raffle == null )
+    void Update()
+    {
+        if (!firstUpdate)
         {
-            Debug.LogError("Fail to find components");
+            starting.UpdateUI();
+            firstUpdate = true;
         }
     }
 
-    public DataRecord GetDataRecord() {  return dataRecord; }
+    public DataRecord GetDataRecord() { return dataRecord; }
     public void StartRaffle()
     {
         Action ending = () =>

@@ -16,6 +16,7 @@ public class DataRecord
     private List<int> teamPoint;
     private Dictionary<string, Member> accountToMembers;
     private List<Member> prizeOwners;
+    private List<string> memberNames;
     private int totalPoint;
     public DataRecord()
     {
@@ -42,15 +43,19 @@ public class DataRecord
             Member member = new() { name = vals[0], account = vals[1], teamID = Int32.Parse(vals[2]), tableID = -1, point = 1 };
 
             members.Add(member);
+            memberNames.Add(member.name);
             accountToMembers[member.account] = member;
             teamToMembers[member.teamID].Add(member);
             teamPoint[member.teamID]++;
             totalPoint++;
         }
+
+        members.Sort(SortMember);
     }
     private void InitCollect()
     {
         members = new();
+        memberNames = new();
         teamPoint = new();
         teamToMembers = new();
         accountToMembers = new();
@@ -65,8 +70,8 @@ public class DataRecord
 
     private int SortMember(Member a, Member b)
     {
-        if (a.point > b.point) return 1;
-        if (a.point < b.point) return -1;
+        if (a.point < b.point) return 1;
+        if (a.point > b.point) return -1;
         
         return a.name.CompareTo(b.name);
     }
@@ -104,17 +109,28 @@ public class DataRecord
 
     public List<string> GetAllMemberNames()
     {
-        List<string> names = new();
-        foreach (Member member in members)
-        {
-            names.Add(member.name);
-        }
+        return memberNames;
+    }
 
-        return names;
+    public string GetRandomMemberName()
+    {
+        return memberNames[UnityEngine.Random.Range(0, memberNames.Count)];
     }
     public int GetTotalPoint() { return totalPoint; }
     
     public int GetTeamPoint(int teamID) { return teamPoint[teamID]; }
+
+    public List<Tuple<string, int>> GetTopMemberNamePoint(int topN = 5)
+    {
+        List<Tuple<string, int>> result = new();
+
+        for (int i = 0; i < topN; i++)
+        {
+            result.Add(Tuple.Create(members[i].account, members[i].point));
+        }
+
+        return result;
+    }
 
     public List<Member> GetPrizeOwners() { return prizeOwners; }
 

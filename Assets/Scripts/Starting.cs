@@ -15,12 +15,10 @@ public class Starting : MonoBehaviour
         public string Account;
     }
 
-    private List<string> teamNames = new() { "FST", "PTT", "S3T", "SET", "STT" };
-
     [Header("Team")]
     public GameObject TeamPanel;
     public List<Button> teamBtns;
-    public List<Image> teamPieCharts;
+    public Piechart piechart;
 
     [Header("Single")]
     public GameObject SinglePanel;
@@ -34,10 +32,7 @@ public class Starting : MonoBehaviour
 
     [Header("Misc")]
     public TMP_Text totalText;
-    public GameObject ranking;
-
-    private List<TMP_Text> rankingNames;
-    private List<TMP_Text> rankingPoints;
+    public Leaderborad leaderboard;
 
     private DataRecord record;
     private Stack<PointOP> history;
@@ -60,8 +55,6 @@ public class Starting : MonoBehaviour
             teamBtns[i].onClick.AddListener(() => AddPointToTeam(teamID));
         }
         addSingleBtn.onClick.AddListener(AddPointToMember);
-
-        UpdateUI();
     }
 
     public void AddPointToMember()
@@ -124,22 +117,10 @@ public class Starting : MonoBehaviour
         }
     }
 
-    private void UpdateUI()
+    public void UpdateUI()
     {
-        int totalPoint = record.GetTotalPoint();
-        float cumulate = 0f;
-
-        for (int i = 4; i >= 0; i--)
-        {
-            float cur;
-            int team = i;
-
-            cumulate += (float)record.GetTeamPoint(i) / totalPoint;
-            cur = cumulate;
-
-            DOTween.To(() => teamPieCharts[team].fillAmount, x => teamPieCharts[team].fillAmount = x, cur, 0.5f).SetEase(Ease.OutQuint);
-        }
-
-        totalText.text = "Total : " + totalPoint.ToString();
+        totalText.text = "Total : " + record.GetTotalPoint().ToString();
+        piechart.UpdateChart();
+        leaderboard.UpdateRank();
     }
 }

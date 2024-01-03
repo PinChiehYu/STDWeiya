@@ -11,7 +11,6 @@ public class Raffle : MonoBehaviour
     private List<TMP_Text> prizeTags = new();
 
     private DataRecord record;
-    private List<string> memberNames;
     private List<Member> prizeOwners;
     private List<string> prizeNames;
 
@@ -27,7 +26,6 @@ public class Raffle : MonoBehaviour
     void Start()
     {
         record = FindObjectOfType<Manager>().GetDataRecord();
-        memberNames = record.GetAllMemberNames();
         prizeOwners = record.GetPrizeOwners();
 
         prizeNames = new() { "First Prize", "Second Prize", "Third Prize", "Forth Prize", "Fifth Prize", "Sixth Prize", "Seventh Prize", "Eighth Prize" };
@@ -72,7 +70,7 @@ public class Raffle : MonoBehaviour
 
             for (int i = stopSeq; i < 20; i++)
             {
-                prizeTags[i].text = memberNames[UnityEngine.Random.Range(0, memberNames.Count)];
+                prizeTags[i].text = record.GetRandomMemberName();
             }
         };
 
