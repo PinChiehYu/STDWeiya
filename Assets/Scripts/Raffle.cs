@@ -14,15 +14,11 @@ public class Raffle : MonoBehaviour
     private List<Member> prizeOwners;
     private List<string> prizeNames;
 
-    public GameObject detailPanel;
-    private Image detailPhoto;
-    private TMP_Text detailName;
-    private TMP_Text detailPrizeName;
+    public PrizeShower prizeShower;
 
     private const int prizeSize = 20;
     private int stopSeq = 0;
 
-    // Start is called before the first frame update
     void Start()
     {
         record = FindObjectOfType<Manager>().GetDataRecord();
@@ -43,11 +39,6 @@ public class Raffle : MonoBehaviour
             prizeBtn.onClick.AddListener(() => ShowPrizeDetail(prizeID));
             prizeBtn.enabled = false;
         }
-
-        detailPhoto = detailPanel.transform.Find("Photo").gameObject.GetComponent<Image>();
-        detailName = detailPanel.transform.Find("Name").gameObject.GetComponent<TMP_Text>();
-        detailPrizeName = detailPanel.transform.Find("PrizeName").gameObject.GetComponent<TMP_Text>();
-        detailPanel.SetActive(false);
     }
 
     public void StartDisplay()
@@ -79,19 +70,13 @@ public class Raffle : MonoBehaviour
 
     public void ShowPrizeDetail(int prizeID)
     {
-        if (detailPanel.activeSelf) return;
+        if (prizeShower.IsActivate()) return;
 
         prizeTags[prizeID].text = prizeOwners[prizeID].name;
 
-        detailName.text = prizeOwners[prizeID].name;
-        detailPrizeName.text = prizeID < 5 ? prizeNames[prizeID] : prizeNames[4 + prizeID / 5];
+        string prizeText = prizeID < 5 ? prizeNames[prizeID] : prizeNames[4 + prizeID / 5];
 
-        detailPanel.SetActive(true);
-        detailPanel.transform.DOScale(1, 0.3f).SetEase(Ease.OutBack);
-    }
-
-    public void ClosePrizeDetail()
-    {
-        detailPanel.transform.DOScale(0, 0.3f).SetEase(Ease.InBack).OnComplete(() => detailPanel.SetActive(false));
+        prizeShower.UpdateInfoWithBonus(prizeOwners[prizeID], prizeText, "10000000");
+        prizeShower.PopUp();
     }
 }

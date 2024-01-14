@@ -13,7 +13,7 @@ public class Leaderborad : MonoBehaviour
     private List<TMP_Text> rankPoints = new();
 
     private DataRecord record;
-    private const int listSize = 5;
+    private const int listSize = 10;
 
     void Start()
     {
