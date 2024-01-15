@@ -5,6 +5,7 @@ public class Member
 {
     public string name;
     public string account;
+    public int level;
     public int teamID;
     public int tableID;
     public int point;
@@ -28,19 +29,25 @@ public class DataRecord
         foreach (string line in lines)
         {
             string[] vals = line.TrimEnd('\r', '\n').Split(":");
-            if (vals.Length != 3)
+            if (vals.Length != 4)
             {
                 Debug.Log("Fail to split: " + line);
                 continue;
             }
 
-            if (!Int32.TryParse(vals[2], out int tid) || tid == 5)
+            if (!Int32.TryParse(vals[2], out int tid))
             {
                 Debug.Log("Fail to parse team ID: " + line);
                 continue;
             }
 
-            Member member = new() { name = vals[0], account = vals[1], teamID = Int32.Parse(vals[2]), tableID = -1, point = 1 };
+            if (!Int32.TryParse(vals[3], out int lv))
+            {
+                Debug.Log("Fail to parse team ID: " + lv);
+                continue;
+            }
+
+            Member member = new() { name = vals[0], account = vals[1], level = lv, teamID = tid, tableID = -1, point = 1 };
 
             members.Add(member);
             memberNames.Add(member.name);
@@ -72,6 +79,8 @@ public class DataRecord
     {
         if (a.point < b.point) return 1;
         if (a.point > b.point) return -1;
+        if (a.level < b.level) return 1;
+        if (a.level > b.level) return -1;
         
         return a.name.CompareTo(b.name);
     }

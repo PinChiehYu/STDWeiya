@@ -7,12 +7,14 @@ using UnityEngine.UI;
 
 public class Raffle : MonoBehaviour
 {
+    private Button startBtn;
     private List<Button> prizeBtnLists = new();
     private List<TMP_Text> prizeTags = new();
 
     private DataRecord record;
     private List<Member> prizeOwners;
     private List<string> prizeNames;
+    private List<string> bonusNames;
 
     public PrizeShower prizeShower;
 
@@ -24,7 +26,11 @@ public class Raffle : MonoBehaviour
         record = FindObjectOfType<Manager>().GetDataRecord();
         prizeOwners = record.GetPrizeOwners();
 
-        prizeNames = new() { "First Prize", "Second Prize", "Third Prize", "Forth Prize", "Fifth Prize", "Sixth Prize", "Seventh Prize", "Eighth Prize" };
+        prizeNames = new() { "10,000", "9,000", "8,000", "7,000", "6,000", "4,000", "3,600", "2,500" };
+        bonusNames = new() { "20,000", "9,000", "8,000", "7,000", "6,000", "5,000", "4,000", "3,000" };
+
+        startBtn = transform.Find("StartBtn").GetComponent<Button>();
+        startBtn.onClick.AddListener(() => StartRaffleProcess());
 
         Transform prizeListObj = transform.Find("PrizeList");
         for (int i = 0; i < prizeOwners.Count; i++)
@@ -66,6 +72,7 @@ public class Raffle : MonoBehaviour
         };
 
         DOTween.To(() => stopSeq, prizeID => updateShuffle(prizeID), prizeSize, 10).SetEase(Ease.InCirc);
+        startBtn.transform.DOScale(0, 0.1f).SetEase(Ease.InBack).OnComplete(() => startBtn.gameObject.SetActive(false));
     }
 
     public void ShowPrizeDetail(int prizeID)
@@ -75,8 +82,9 @@ public class Raffle : MonoBehaviour
         prizeTags[prizeID].text = prizeOwners[prizeID].name;
 
         string prizeText = prizeID < 5 ? prizeNames[prizeID] : prizeNames[4 + prizeID / 5];
+        string bonusText = prizeID < 5 ? bonusNames[prizeID] : bonusNames[4 + prizeID / 5];
 
-        prizeShower.UpdateInfoWithBonus(prizeOwners[prizeID], prizeText, "10000000");
+        prizeShower.UpdateInfoWithBonus(prizeOwners[prizeID], prizeText, bonusText);
         prizeShower.PopUp();
     }
 }
