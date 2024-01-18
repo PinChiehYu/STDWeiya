@@ -83,7 +83,9 @@ public class DataRecord
         if (a.point > b.point) return -1;
         if (a.level < b.level) return 1;
         if (a.level > b.level) return -1;
-        
+        if (a.teamID != 4 && b.teamID == 4) return 1;
+        if (a.teamID == 4 && b.teamID != 4) return -1;
+
         return a.name.CompareTo(b.name);
     }
 

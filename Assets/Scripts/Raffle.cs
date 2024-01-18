@@ -15,6 +15,7 @@ public class Raffle : MonoBehaviour
     private List<Member> prizeOwners;
     private List<string> prizeNames;
     private List<string> bonusNames;
+    private List<bool> bonusHasShown;
 
     public PrizeShower prizeShower;
 
@@ -27,7 +28,8 @@ public class Raffle : MonoBehaviour
         prizeOwners = record.GetPrizeOwners();
 
         prizeNames = new() { "10,000", "9,000", "8,000", "7,000", "6,000", "4,000", "3,600", "2,500" };
-        bonusNames = new() { "20,000", "",      "",      "",      "",      "5,000", "4,000", "3,000" };
+        bonusNames = new() { "20,000",      "",      "",      "",      "", "5,000", "4,000", "3,000" };
+        bonusHasShown = new() { false,   false,   false,   false,   false,   false,   false,   false };
 
         startBtn = transform.Find("StartBtn").GetComponent<Button>();
         startBtn.onClick.AddListener(() => StartRaffleProcess());
@@ -81,8 +83,10 @@ public class Raffle : MonoBehaviour
 
         prizeTags[prizeID].text = prizeOwners[prizeID].name;
 
-        string prizeText = prizeID < 5 ? prizeNames[prizeID] : prizeNames[4 + prizeID / 5];
-        string bonusText = prizeID < 5 ? bonusNames[prizeID] : bonusNames[4 + prizeID / 5];
+        int idx = prizeID < 5 ? prizeID : 4 + prizeID / 5;
+        string prizeText = prizeNames[idx];
+        string bonusText = bonusNames[idx];
+        bool hasShown = bonusHasShown[idx];
 
         if (bonusText.Equals(""))
         {
@@ -90,9 +94,10 @@ public class Raffle : MonoBehaviour
         }
         else
         {
-            prizeShower.UpdateInfoWithBonus(prizeOwners[prizeID], prizeText, bonusText);
+            prizeShower.UpdateInfoWithBonus(prizeOwners[prizeID], prizeText, bonusText, hasShown);
         }
 
+        bonusHasShown[idx] = true;
         prizeShower.PopUp();
     }
 }
