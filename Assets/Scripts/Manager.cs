@@ -37,6 +37,7 @@ public class Manager : MonoBehaviour
     }
 
     public DataRecord GetDataRecord() { return dataRecord; }
+
     public void StartRaffle()
     {
         Action ending = () =>

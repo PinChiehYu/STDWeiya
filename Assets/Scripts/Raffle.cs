@@ -27,7 +27,7 @@ public class Raffle : MonoBehaviour
         prizeOwners = record.GetPrizeOwners();
 
         prizeNames = new() { "10,000", "9,000", "8,000", "7,000", "6,000", "4,000", "3,600", "2,500" };
-        bonusNames = new() { "20,000", "9,000", "8,000", "7,000", "6,000", "5,000", "4,000", "3,000" };
+        bonusNames = new() { "20,000", "",      "",      "",      "",      "5,000", "4,000", "3,000" };
 
         startBtn = transform.Find("StartBtn").GetComponent<Button>();
         startBtn.onClick.AddListener(() => StartRaffleProcess());
@@ -84,7 +84,15 @@ public class Raffle : MonoBehaviour
         string prizeText = prizeID < 5 ? prizeNames[prizeID] : prizeNames[4 + prizeID / 5];
         string bonusText = prizeID < 5 ? bonusNames[prizeID] : bonusNames[4 + prizeID / 5];
 
-        prizeShower.UpdateInfoWithBonus(prizeOwners[prizeID], prizeText, bonusText);
+        if (bonusText.Equals(""))
+        {
+            prizeShower.UpdateInfo(prizeOwners[prizeID], prizeText);
+        }
+        else
+        {
+            prizeShower.UpdateInfoWithBonus(prizeOwners[prizeID], prizeText, bonusText);
+        }
+
         prizeShower.PopUp();
     }
 }

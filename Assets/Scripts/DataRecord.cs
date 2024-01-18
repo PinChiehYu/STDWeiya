@@ -19,6 +19,7 @@ public class DataRecord
     private List<Member> prizeOwners;
     private List<string> memberNames;
     private int totalPoint;
+
     public DataRecord()
     {
         InitCollect();
@@ -59,6 +60,7 @@ public class DataRecord
 
         members.Sort(SortMember);
     }
+
     private void InitCollect()
     {
         members = new();
@@ -125,6 +127,7 @@ public class DataRecord
     {
         return memberNames[UnityEngine.Random.Range(0, memberNames.Count)];
     }
+
     public int GetTotalPoint() { return totalPoint; }
     
     public int GetTeamPoint(int teamID) { return teamPoint[teamID]; }
@@ -142,6 +145,11 @@ public class DataRecord
     }
 
     public List<Member> GetPrizeOwners() { return prizeOwners; }
+
+    public bool HasMemberAccount(string account)
+    {
+        return accountToMembers.ContainsKey(account);
+    }
 
     public void Raffle()
     {

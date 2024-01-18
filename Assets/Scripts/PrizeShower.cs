@@ -54,12 +54,14 @@ public class PrizeShower : MonoBehaviour
 
     public void Close()
     {
-        transform.DOScale(0, 0.3f).OnComplete(() => { 
-            gameObject.SetActive(false);
+        transform.DOScale(0, 0.3f).OnComplete(() => {
+            colorTween.Kill();
+            colorTween = null;
             prizeBtn.image.color = Color.white;
-            colorTween.Kill(); 
+            gameObject.SetActive(false);
         }).SetEase(Ease.InBack);
     }
+
     public bool IsActivate() { return gameObject.activeSelf; } 
 
     private void StartBonusProcess()
@@ -70,7 +72,13 @@ public class PrizeShower : MonoBehaviour
         var seq = DOTween.Sequence();
         seq.Append(prizeBtn.transform.DOScale(0, 0.5f).OnComplete(() => prizeText.text = bonusText));
         seq.Append(prizeBtn.transform.DOScale(1, 0.5f));
-        seq.Insert(0f, prizeBtn.transform.DORotate(new Vector3(360.0f, 0.0f), 1.0f, RotateMode.FastBeyond360).SetEase(Ease.Linear));
+        seq.Insert(0f, prizeBtn.transform.DORotate(new Vector3(720.0f, 0.0f), 1.0f, RotateMode.FastBeyond360).SetEase(Ease.Linear));
+
+        if (colorTween != null && colorTween.IsPlaying())
+        {
+            colorTween.Kill();
+            colorTween = null;
+        }
 
         colorTween = DOTween.To(() => timer, x =>
         {
