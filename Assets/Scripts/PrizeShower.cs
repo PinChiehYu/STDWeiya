@@ -117,7 +117,7 @@ public class PrizeShower : MonoBehaviour
         seq.AppendInterval(0.5f);
         seq.Append(dialogBackground.GetComponent<RectTransform>().DOAnchorPosY(230, 1f));
         seq.Join(dialogBackground.DOColor(Color.white, 1f));
-        seq.Append(DOTween.To(() => txt, x => txt = x, "¡P¡P¡P", 3.0f).OnUpdate(() => dialogText.text = txt));
+        seq.Append(DOTween.To(() => txt, x => txt = x, "¡P¡P¡P", 1.5f).OnUpdate(() => dialogText.text = txt));
 
         // Check
         seq.Append(prizeBtn.transform.DORotate(new Vector3(720.0f, 0.0f), 1.0f, RotateMode.FastBeyond360).SetEase(Ease.Linear));

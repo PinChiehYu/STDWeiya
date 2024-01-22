@@ -10,6 +10,7 @@ public class Raffle : MonoBehaviour
     private Button startBtn;
     private List<Button> prizeBtnLists = new();
     private List<TMP_Text> prizeTags = new();
+    private Button prizeBtnThx;
 
     private DataRecord record;
     private List<Member> prizeOwners;
@@ -17,10 +18,14 @@ public class Raffle : MonoBehaviour
     private List<string> bonusNames;
     private List<bool> bonusHasShown;
 
+    private Image specialThanksBg;
+    private TMP_Text specialThanksText;
+
     public PrizeShower prizeShower;
 
     private const int prizeSize = 20;
     private int stopSeq = 0;
+    private bool isShowingSpecialThanks = false;
 
     void Start()
     {
@@ -47,11 +52,12 @@ public class Raffle : MonoBehaviour
             prizeBtn.onClick.AddListener(() => ShowPrizeDetail(prizeID));
             prizeBtn.enabled = false;
         }
-    }
 
-    public void StartDisplay()
-    {
-        Debug.Log("Yea");
+        prizeBtnThx = prizeListObj.Find("PrizeThx").gameObject.GetComponent<Button>();
+        prizeBtnThx.onClick.AddListener(ShowSpecialThanks);
+
+        specialThanksBg = transform.Find("SpecialThanks").gameObject.GetComponent<Image>();
+        specialThanksText = transform.Find("SpecialThanks").Find("SpecialThanksText").gameObject.GetComponent<TMP_Text>();
     }
 
     public void StartRaffleProcess()
@@ -73,13 +79,16 @@ public class Raffle : MonoBehaviour
             }
         };
 
-        DOTween.To(() => stopSeq, prizeID => updateShuffle(prizeID), prizeSize, 10).SetEase(Ease.InCirc);
+        var seq = DOTween.Sequence();
+        seq.Append(DOTween.To(() => stopSeq, prizeID => updateShuffle(prizeID), prizeSize, 10).SetEase(Ease.InCirc));
+        seq.Append(prizeBtnThx.transform.DOScale(1f, 0.1f).SetDelay(0.5f));
         startBtn.transform.DOScale(0, 0.1f).SetEase(Ease.InBack).OnComplete(() => startBtn.gameObject.SetActive(false));
     }
 
-    public void ShowPrizeDetail(int prizeID)
+    private void ShowPrizeDetail(int prizeID)
     {
         if (prizeShower.IsActivate()) return;
+        if (isShowingSpecialThanks) return;
 
         prizeTags[prizeID].text = prizeOwners[prizeID].name;
 
@@ -99,5 +108,19 @@ public class Raffle : MonoBehaviour
 
         bonusHasShown[idx] = true;
         prizeShower.PopUp();
+    }
+
+    private void ShowSpecialThanks()
+    {
+        if (prizeShower.IsActivate()) return;
+        if (isShowingSpecialThanks) return;
+
+        isShowingSpecialThanks = true;
+        specialThanksText.rectTransform.anchoredPosition = new Vector2(0, -1200);
+
+        var seq = DOTween.Sequence();
+        seq.Append(specialThanksBg.DOFade(1f, 0.75f));
+        seq.Append(specialThanksText.rectTransform.DOAnchorPosY(1200, 10f).SetEase(Ease.Linear));
+        seq.Append(specialThanksBg.DOFade(0f, 0.75f).OnComplete(() => isShowingSpecialThanks = false));
     }
 }

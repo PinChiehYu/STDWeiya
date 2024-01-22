@@ -48,9 +48,9 @@ public class Manager : MonoBehaviour
         };
 
         var seq = DOTween.Sequence();
-        seq.Append(DOTween.ToAlpha(() => blackout.color, x => blackout.color = x, 1, 0.5f).OnStepComplete(delegate { ending(); }));
+        seq.Append(blackout.DOFade(1, 0.5f).OnComplete(() => ending()));
         seq.AppendInterval(0.5f);
-        seq.Append(DOTween.ToAlpha(() => blackout.color, x => blackout.color = x, 0, 0.5f).OnStepComplete(() => raffle.StartDisplay()));
+        seq.Append(blackout.DOFade(0, 0.5f));
     }
 
     public void CloseApp()
