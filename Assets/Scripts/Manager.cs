@@ -40,12 +40,12 @@ public class Manager : MonoBehaviour
 
     public void StartRaffle()
     {
-        Action ending = () =>
+        void ending()
         {
             dataRecord.Raffle();
             raffleObj.SetActive(true);
             startingObj.SetActive(false);
-        };
+        }
 
         var seq = DOTween.Sequence();
         seq.Append(blackout.DOFade(1, 0.5f).OnComplete(() => ending()));

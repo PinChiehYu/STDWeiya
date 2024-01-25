@@ -40,6 +40,8 @@ public class PrizeShower : MonoBehaviour
         prizeBtn.onClick.AddListener(() => StartBonusAnimation());
         showBonusAnimation = false;
 
+        RainbowEffect.Create(transform.Find("Congrat").gameObject.GetComponent<Image>(), 0.5f);
+
         transform.localScale = Vector3.zero;
         gameObject.SetActive(false);
     }
@@ -115,9 +117,9 @@ public class PrizeShower : MonoBehaviour
         // Kenneth
         seq.Append(kennethFigureRect.DOAnchorPosY(-325, 1.0f).SetEase(Ease.InOutBack));
         seq.AppendInterval(0.5f);
-        seq.Append(dialogBackground.GetComponent<RectTransform>().DOAnchorPosY(230, 1f));
-        seq.Join(dialogBackground.DOColor(Color.white, 1f));
-        seq.Append(DOTween.To(() => txt, x => txt = x, "¡P¡P¡P", 1.5f).OnUpdate(() => dialogText.text = txt));
+        seq.Append(dialogBackground.GetComponent<RectTransform>().DOAnchorPosY(230, 0.5f));
+        seq.Join(dialogBackground.DOColor(Color.white, 0.5f));
+        seq.Append(DOTween.To(() => txt, x => txt = x, "¡P¡P¡P", 1f).OnUpdate(() => dialogText.text = txt));
 
         // Check
         seq.Append(prizeBtn.transform.DORotate(new Vector3(720.0f, 0.0f), 1.0f, RotateMode.FastBeyond360).SetEase(Ease.Linear));
@@ -138,17 +140,7 @@ public class PrizeShower : MonoBehaviour
 
         if (activate)
         {
-            float timer = 0f;
-            colorTween = DOTween.To(() => timer, x =>
-            {
-                timer = x;
-                if (timer <= 1f) prizeBtn.image.color = new Color(timer, 0f, 1f);
-                else if (timer <= 2f) prizeBtn.image.color = new Color(1f, 0f, 1f - (timer - 1f));
-                else if (timer <= 3f) prizeBtn.image.color = new Color(1f, timer - 2f, 0f);
-                else if (timer <= 4f) prizeBtn.image.color = new Color(1f - (timer - 3f), 1f, 0f);
-                else if (timer <= 5f) prizeBtn.image.color = new Color(0f, 1f, timer - 4f);
-                else if (timer <= 6f) prizeBtn.image.color = new Color(0f, 1f - (timer - 5f), 1f);
-            }, 6, 1f).SetEase(Ease.Linear).SetLoops(-1, LoopType.Restart);
+            colorTween = RainbowEffect.Create(prizeBtn.image, 1f);
         }
     }
 }

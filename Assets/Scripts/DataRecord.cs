@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 public class Member
@@ -17,6 +18,7 @@ public class DataRecord
     private List<int> teamPoint;
     private Dictionary<string, Member> accountToMembers;
     private List<Member> prizeOwners;
+    private List<Member> prizeRemainMembers;
     private List<string> memberNames;
     private int totalPoint;
 
@@ -69,6 +71,7 @@ public class DataRecord
         teamToMembers = new();
         accountToMembers = new();
         prizeOwners = new();
+        prizeRemainMembers = new();
         for (int i = 0; i < 5; i++)
         {
             teamToMembers.Add(new());
@@ -148,6 +151,8 @@ public class DataRecord
 
     public List<Member> GetPrizeOwners() { return prizeOwners; }
 
+    public List<Member> GetPrizeRemainMembers() { return prizeRemainMembers; }
+
     public bool HasMemberAccount(string account)
     {
         return accountToMembers.ContainsKey(account);
@@ -157,7 +162,7 @@ public class DataRecord
     {
         UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
 
-        List<Member> remainMembers = members;
+        prizeRemainMembers = members;
         int remainPoint = totalPoint;
         int poll, cumulate;
 
@@ -165,17 +170,40 @@ public class DataRecord
         {
             poll = UnityEngine.Random.Range(0, remainPoint);
             cumulate = 0;
-            foreach (Member member in remainMembers)
+            foreach (Member member in prizeRemainMembers)
             {
                 cumulate += member.point;
                 if (cumulate > poll)
                 {
                     prizeOwners.Add(member);
                     remainPoint -= member.point;
-                    remainMembers.Remove(member);
+                    prizeRemainMembers.Remove(member);
+
                     break;
                 }
             }
         }
+
+        SaveResult();
+    }
+
+    private void SaveResult()
+    {
+        string path = Directory.GetCurrentDirectory() + "/prize_result.txt";
+        List<string> prize = new() { "20000", "9000", "8000", "7000", "6000", "5000", "4000", "3000" };
+        List<string> result = new List<string>();
+
+        for (int i = 0; i < prizeOwners.Count; i++)
+        {
+            int idx = i < 5 ? i : 4 + i / 5;
+            result.Add(prizeOwners[i].account + ":" + prize[idx]);
+        }
+
+        foreach (var member in prizeRemainMembers)
+        {
+            result.Add(member.account + ":2000");
+        }
+
+        File.WriteAllLines(path, result);
     }
 }

@@ -14,6 +14,7 @@ public class Raffle : MonoBehaviour
 
     private DataRecord record;
     private List<Member> prizeOwners;
+    private List<Member> prizeRemainMembers;
     private List<string> prizeNames;
     private List<string> bonusNames;
     private List<bool> bonusHasShown;
@@ -31,6 +32,7 @@ public class Raffle : MonoBehaviour
     {
         record = FindObjectOfType<Manager>().GetDataRecord();
         prizeOwners = record.GetPrizeOwners();
+        prizeRemainMembers = record.GetPrizeRemainMembers();
 
         prizeNames = new() { "10,000", "9,000", "8,000", "7,000", "6,000", "4,000", "3,600", "2,500" };
         bonusNames = new() { "20,000",      "",      "",      "",      "", "5,000", "4,000", "3,000" };
@@ -51,6 +53,13 @@ public class Raffle : MonoBehaviour
             int prizeID = i;
             prizeBtn.onClick.AddListener(() => ShowPrizeDetail(prizeID));
             prizeBtn.enabled = false;
+        }
+
+        Transform labelListObj = transform.Find("LabelList");
+        for (int i = 0; i < prizeNames.Count; i++)
+        {
+            TMP_Text text = labelListObj.Find("Label" + i.ToString()).gameObject.GetComponent<TMP_Text>();
+            RainbowEffect.Create(text, i + 1f);
         }
 
         prizeBtnThx = prizeListObj.Find("PrizeThx").gameObject.GetComponent<Button>();
@@ -78,6 +87,14 @@ public class Raffle : MonoBehaviour
                 prizeTags[i].text = record.GetRandomMemberName();
             }
         };
+
+        string thankTxt = specialThanksText.text;
+        thankTxt += "<size=150%>~ Special Thanks ~\n\n<size=100%>";
+        foreach (var member in prizeRemainMembers)
+        {
+            thankTxt += member.name + " : 2,000\n\n";
+        }
+        specialThanksText.text = thankTxt;
 
         var seq = DOTween.Sequence();
         seq.Append(DOTween.To(() => stopSeq, prizeID => updateShuffle(prizeID), prizeSize, 10).SetEase(Ease.InCirc));
@@ -116,11 +133,11 @@ public class Raffle : MonoBehaviour
         if (isShowingSpecialThanks) return;
 
         isShowingSpecialThanks = true;
-        specialThanksText.rectTransform.anchoredPosition = new Vector2(0, -1200);
+        specialThanksText.rectTransform.anchoredPosition = new Vector2(0, -2200);
 
         var seq = DOTween.Sequence();
         seq.Append(specialThanksBg.DOFade(1f, 0.75f));
-        seq.Append(specialThanksText.rectTransform.DOAnchorPosY(1200, 10f).SetEase(Ease.Linear));
+        seq.Append(specialThanksText.rectTransform.DOAnchorPosY(2200, 20f).SetEase(Ease.Linear));
         seq.Append(specialThanksBg.DOFade(0f, 0.75f).OnComplete(() => isShowingSpecialThanks = false));
     }
 }
